@@ -88,6 +88,21 @@ fn infix_to_postfix(input: &str) -> VecDeque<String> {
 
 // }
 
+fn evaluate(expr: &Expr, assignment: &HashMap<char, bool>) -> bool {
+    match expr {
+        Expr::Var(c) => *assignment.get(c).unwrap_or(&false),
+        Expr::Not(inner) => !evaluate(inner, assignment),
+        Expr::And(left, right) => evaluate(left, assignment) && evaluate(right, assignment),
+        Expr::Or(left, right) => evaluate(left, assignment) || evaluate(right, assignment),
+        Expr::Implies(left, right) => !evaluate(left, assignment) || evaluate(right, assignment),
+        Expr::Biconditional(left, right) => {
+            let left_val = evaluate(left, assignment);
+            let right_val = evaluate(right, assignment);
+            (left_val && right_val) || (!left_val && !right_val)
+        }
+    }
+}
+
 
 
 fn main() {
